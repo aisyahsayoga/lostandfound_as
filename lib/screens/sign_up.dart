@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+import '../components/buttons.dart';
+import '../components/form_fields.dart';
+import '../components/animations.dart';
+import '../theme/theme_data.dart';
+
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+
+  void _onSignUpPressed() {
+    // TODO: Implement sign up logic
+  }
+
+  void _onLoginPressed() {
+    // TODO: Implement navigation back to login
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: appThemeData.scaffoldBackgroundColor,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FadeIn(
+                child: Text(
+                  'Create Account',
+                  style: appThemeData.textTheme.headline1,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 24),
+              FadeIn(
+                child: TextInputField(
+                  label: 'Full Name',
+                  hintText: 'Your full name',
+                  controller: nameController,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FadeIn(
+                child: TextInputField(
+                  label: 'Email',
+                  hintText: 'your.email@example.com',
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FadeIn(
+                child: TextInputField(
+                  label: 'Password',
+                  hintText: 'Create a password',
+                  controller: passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                ),
+              ),
+              const SizedBox(height: 20),
+              FadeIn(
+                child: TextInputField(
+                  label: 'Confirm Password',
+                  hintText: 'Re-enter your password',
+                  controller: confirmPasswordController,
+                  keyboardType: TextInputType.visiblePassword,
+                ),
+              ),
+              const SizedBox(height: 32),
+              FadeIn(
+                child: PrimaryButton(
+                  label: 'Sign Up',
+                  onPressed: _onSignUpPressed,
+                ),
+              ),
+              const SizedBox(height: 16),
+              FadeIn(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account?",
+                      style: appThemeData.textTheme.bodyText2,
+                    ),
+                    TextButton(
+                      onPressed: _onLoginPressed,
+                      child: Text(
+                        'Login',
+                        style: appThemeData.textTheme.bodyText2!.copyWith(
+                          color: appThemeData.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
