@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../theme/theme_data.dart';
+import '../theme/color_palette.dart';
 import '../components/buttons.dart';
 import '../components/animations.dart';
-import '../theme/theme_data.dart';
+import 'package:lost_and_found/screens/sign_up.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -33,7 +35,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
     } else {
-      // TODO: Navigate to login or home screen after onboarding
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignUpScreen()),
+      );
     }
   }
 

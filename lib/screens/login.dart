@@ -4,6 +4,9 @@ import '../components/form_fields.dart';
 import '../components/animations.dart';
 import '../theme/theme_data.dart';
 import '../theme/typography.dart';
+import '../services/auth_service.dart';
+import 'demo_home.dart';
+import 'sign_up.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,12 +19,38 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  void _onLoginPressed() {
-    // TODO: Implement login logic
+  void _onLoginPressed() async {
+    try {
+      final success = await AuthService().login(
+        emailController.text,
+        passwordController.text,
+      );
+
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login berhasil!')),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const DemoHomeScreen()),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
   }
 
   void _onSignUpPressed() {
-    // TODO: Implement navigation to sign up
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => SignUpScreen()),
+    );
   }
 
   void _onForgotPasswordPressed() {

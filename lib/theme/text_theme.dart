@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'typography.dart';
 
 final TextTheme appTextTheme = TextTheme(
-  displayLarge: AppTypography.headline1,
-  displayMedium: AppTypography.headline2,
-  bodyLarge: AppTypography.bodyText1,
-  bodyMedium: AppTypography.bodyText2,
-  labelSmall: AppTypography.caption,
+  displayLarge: AppTypography.displayLarge,
+  displayMedium: AppTypography.displayMedium,
+  displaySmall: AppTypography.displaySmall,
+  headlineLarge: AppTypography.headlineLarge,
+  headlineMedium: AppTypography.headlineMedium,
+  headlineSmall: AppTypography.headlineSmall,
+  bodyLarge: AppTypography.bodyLarge,
+  bodyMedium: AppTypography.bodyMedium,
+  labelLarge: AppTypography.labelLarge,
+  bodySmall: AppTypography.bodySmall,
+  labelSmall: AppTypography.labelSmall,
 );

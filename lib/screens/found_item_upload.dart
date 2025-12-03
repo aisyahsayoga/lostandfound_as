@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../components/buttons.dart';
-import '../components/form_fields.dart';
-import '../components/animations.dart';
-import '../theme/color_palette.dart';
 import '../theme/theme_data.dart';
+import '../theme/color_palette.dart';
+import '../components/form_fields.dart';
+import '../components/buttons.dart';
+import '../components/animations.dart';
 
 class FoundItemUploadScreen extends StatefulWidget {
   const FoundItemUploadScreen({Key? key}) : super(key: key);
@@ -64,7 +64,7 @@ class _FoundItemUploadScreenState extends State<FoundItemUploadScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Location Found', style: Theme.of(context).textTheme.bodyText1?.copyWith(fontWeight: FontWeight.w600)),
+            Text('Location Found', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () {

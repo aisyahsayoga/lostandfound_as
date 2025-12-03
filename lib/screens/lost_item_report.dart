@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import '../theme/theme_data.dart';
+import '../theme/color_palette.dart';
+import '../components/form_fields.dart';
+import '../components/buttons.dart';
+import '../components/animations.dart';
 import '../components/buttons.dart';
 import '../components/form_fields.dart';
 import '../components/animations.dart';

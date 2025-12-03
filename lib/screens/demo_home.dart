@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../theme/theme_data.dart';
+import '../theme/color_palette.dart';
+import '../components/animations.dart';
 
 // --- MAIN (Hanya untuk mengetes) ---
 void main() {
@@ -80,7 +83,8 @@ class DemoHomeScreen extends StatelessWidget {
                               color: AppColors.shadow,
                               blurRadius: 8,
                               offset: const Offset(0, 4),
-                            ),d
+                            )
+
                           ],
                         ),
                         child: Column(
@@ -94,7 +98,7 @@ class DemoHomeScreen extends StatelessWidget {
                             const SizedBox(height: 12),
                             Text(
                               screenData['title'],
-                              style: appThemeData.textTheme.bodyText1?.copyWith(
+                              style: appThemeData.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.neutralDark,
                               ),

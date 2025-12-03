@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'color_palette.dart';
 import 'typography.dart';
+import 'text_theme.dart';
 
 final ThemeData appThemeData = ThemeData(
   scaffoldBackgroundColor: AppColors.background,
@@ -36,7 +37,7 @@ final ThemeData appThemeData = ThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      textStyle: AppTypography.bodyText1,
+      textStyle: AppTypography.bodyLarge,
       elevation: 4,
       shadowColor: AppColors.shadow,
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),

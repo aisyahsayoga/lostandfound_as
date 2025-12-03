@@ -21,7 +21,7 @@ class PrimaryButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.accentPrimary,
         foregroundColor: Colors.white,
-        textStyle: AppTypography.bodyText1.copyWith(fontWeight: FontWeight.w600),
+        textStyle: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

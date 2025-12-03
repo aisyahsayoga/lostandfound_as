@@ -25,7 +25,7 @@ class TextInputField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTypography.bodyText1.copyWith(
+          style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.neutralDark,
           ),
@@ -38,7 +38,7 @@ class TextInputField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hintText,
           ),
-          style: AppTypography.bodyText1,
+          style: AppTypography.bodyLarge,
         ),
       ],
     );

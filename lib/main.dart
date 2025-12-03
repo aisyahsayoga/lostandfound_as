@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'theme/theme_data.dart';
-import 'screens/demo_home.dart';
+import 'screens/onboarding.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Lost & Found',
       theme: appThemeData,
-      home: const OnboardingScreen(),
+      home: OnboardingScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
