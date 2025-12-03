@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
-import '../components/icons.dart';
-import '../components/buttons.dart';
-import '../components/icons.dart';
-import '../components/animations.dart';
-import '../theme/color_palette.dart';
-import '../theme/theme_data.dart';
 
 class MapViewScreen extends StatefulWidget {
   const MapViewScreen({Key? key}) : super(key: key);

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/color_palette.dart';
-import '../theme/color_palette.dart';
 
 class AppIcons {
   static const double iconSize = 24;

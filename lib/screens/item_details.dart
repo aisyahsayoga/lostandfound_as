@@ -36,26 +36,16 @@ class ItemDetailsScreen extends StatelessWidget {
             FadeIn(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  imageUrl,
-                  height: 240,
-                  fit: BoxFit.cover,
-                ),
+                child: Image.network(imageUrl, height: 240, fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 24),
             FadeIn(
-              child: Text(
-                title,
-                style: appThemeData.textTheme.displayLarge,
-              ),
+              child: Text(title, style: appThemeData.textTheme.displayLarge),
             ),
             const SizedBox(height: 12),
             FadeIn(
-              child: Text(
-                description,
-                style: appThemeData.textTheme.bodyText1,
-              ),
+              child: Text(description, style: appThemeData.textTheme.bodyLarge),
             ),
             const SizedBox(height: 24),
             FadeIn(
@@ -68,7 +58,9 @@ class ItemDetailsScreen extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'Map with pin at: $location',
-                    style: appThemeData.textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                    style: appThemeData.textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),

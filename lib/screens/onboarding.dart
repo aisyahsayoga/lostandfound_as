@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
-import '../theme/color_palette.dart';
 import '../components/buttons.dart';
 import '../components/animations.dart';
-import 'package:lost_and_found/screens/sign_up.dart';
+import 'home_dashboard.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -19,7 +18,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> _pages = [
     {
       'title': 'Welcome to Lost & Found',
-      'description': 'Find lost items or upload found items quickly and easily.',
+      'description':
+          'Find lost items or upload found items quickly and easily.',
     },
     {
       'title': 'Report Lost Items',
@@ -27,17 +27,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
     {
       'title': 'Upload Found Items',
-      'description': 'Help reunite items with their owners by uploading found items.',
+      'description':
+          'Help reunite items with their owners by uploading found items.',
     },
   ];
 
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
-      _pageController.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SignUpScreen()),
+        MaterialPageRoute(builder: (context) => const HomeDashboardScreen()),
       );
     }
   }
@@ -85,7 +89,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           height: 8,
           width: _currentPage == index ? 24 : 8,
           decoration: BoxDecoration(
-            color: _currentPage == index ? appThemeData.colorScheme.primary : appThemeData.colorScheme.primary.withOpacity(0.3),
+            color: _currentPage == index
+                ? appThemeData.colorScheme.primary
+                : appThemeData.colorScheme.primary.withOpacity(0.3),
             borderRadius: BorderRadius.circular(12),
           ),
         ),

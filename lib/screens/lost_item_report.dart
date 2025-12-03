@@ -4,11 +4,6 @@ import '../theme/color_palette.dart';
 import '../components/form_fields.dart';
 import '../components/buttons.dart';
 import '../components/animations.dart';
-import '../components/buttons.dart';
-import '../components/form_fields.dart';
-import '../components/animations.dart';
-import '../theme/color_palette.dart';
-import '../theme/theme_data.dart';
 
 class LostItemReportScreen extends StatefulWidget {
   const LostItemReportScreen({Key? key}) : super(key: key);
@@ -69,7 +64,13 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
     if (time == null) return;
 
     setState(() {
-      timeOfLoss = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      timeOfLoss = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
     });
   }
 
@@ -101,10 +102,7 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
           ),
           value: selectedCategory,
           items: categories.map((cat) {
-            return DropdownMenuItem<String>(
-              value: cat,
-              child: Text(cat),
-            );
+            return DropdownMenuItem<String>(value: cat, child: Text(cat));
           }).toList(),
           onChanged: (val) => setState(() => selectedCategory = val),
         );
@@ -112,7 +110,12 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Last Seen Location', style: Theme.of(context).textTheme.bodyText1?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Last Seen Location',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () {
@@ -125,7 +128,9 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.neutralMedium),
                 ),
-                child: Center(child: Text(lastSeenLocation ?? 'Select location on map')),
+                child: Center(
+                  child: Text(lastSeenLocation ?? 'Select location on map'),
+                ),
               ),
             ),
           ],
@@ -134,7 +139,12 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Time of Loss', style: Theme.of(context).textTheme.bodyText1?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Time of Loss',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 8),
             GestureDetector(
               onTap: _selectDateTime,
@@ -147,7 +157,11 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                   border: Border.all(color: AppColors.neutralMedium),
                 ),
                 alignment: Alignment.centerLeft,
-                child: Text(timeOfLoss != null ? timeOfLoss.toString() : 'Select time of loss'),
+                child: Text(
+                  timeOfLoss != null
+                      ? timeOfLoss.toString()
+                      : 'Select time of loss',
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -184,20 +198,13 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
               style: appThemeData.textTheme.bodyMedium,
             ),
             const SizedBox(height: 24),
-            Expanded(
-              child: FadeIn(
-                child: _buildStepContent(),
-              ),
-            ),
+            Expanded(child: FadeIn(child: _buildStepContent())),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (_currentStep > 0)
-                  SecondaryButton(
-                    label: 'Back',
-                    onPressed: _onBack,
-                  )
+                  SecondaryButton(label: 'Back', onPressed: _onBack)
                 else
                   const SizedBox(width: 100),
                 PrimaryButton(

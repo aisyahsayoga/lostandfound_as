@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
-import '../theme/color_palette.dart';
-import '../components/form_fields.dart';
-import '../components/buttons.dart';
-import '../components/animations.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   const ProfileSettingsScreen({Key? key}) : super(key: key);
@@ -14,11 +10,7 @@ class ProfileSettingsScreen extends StatefulWidget {
 
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   bool notificationsEnabled = true;
-  List<String> savedItems = [
-    'Lost Wallet',
-    'Found Dog',
-    'Car Keys',
-  ];
+  List<String> savedItems = ['Lost Wallet', 'Found Dog', 'Car Keys'];
 
   void _toggleNotifications(bool? value) {
     if (value == null) return;
@@ -51,7 +43,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     child: Icon(Icons.person, size: 60),
                   ),
                   const SizedBox(height: 12),
-                  Text('Username', style: appThemeData.textTheme.headline2),
+                  Text('Username', style: appThemeData.textTheme.titleLarge),
                   const SizedBox(height: 24),
                   SwitchListTile(
                     title: const Text('Enable Notifications'),
@@ -62,7 +54,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                   const SizedBox(height: 24),
                   Text(
                     'Saved Items / Watchlist',
-                    style: appThemeData.textTheme.headline2,
+                    style: appThemeData.textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 12),
                   ...savedItems.map((item) {

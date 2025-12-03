@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import '../components/buttons.dart';
 import '../components/cards.dart';
 import '../components/icons.dart';
 import '../components/animations.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
-import '../theme/typography.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
-  const HomeDashboardScreen({Key? key}) : super(key: key);
+  const HomeDashboardScreen({super.key});
 
   @override
   State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
@@ -17,6 +15,8 @@ class HomeDashboardScreen extends StatefulWidget {
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   int _selectedIndex = 0;
   final TextEditingController searchController = TextEditingController();
+  final TextEditingController _itemNameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   final List<Map<String, dynamic>> categories = [
     {'label': 'Electronics', 'icon': AppIcons.categoryElectronics()},
@@ -43,22 +43,130 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   ];
 
   void _onCategorySelected(String category) {
-    // TODO: Implement category filter logic
+    setState(() {
+      final filteredItems = recentItems.where((item) {
+        final statusToCategory = {'Lost': 'Personal Items', 'Found': 'Pets'};
+        return statusToCategory[item['status']] == category;
+      }).toList();
+      recentItems
+        ..clear()
+        ..addAll(filteredItems);
+    });
   }
 
   void _onItemSelected(String title) {
-    // TODO: Implement navigation to item details
+    Navigator.pushNamed(context, '/item-details', arguments: {'title': title});
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    // TODO: Navigate to different screens based on index
+    switch (index) {
+      case 0:
+        // Already on HomeDashboardScreen
+        break;
+      case 1:
+        Navigator.pushNamed(context, '/search');
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/map');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile');
+        break;
+    }
   }
 
   void _onFabPressed() {
-    // TODO: Show modal for quick report
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext modalContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Quick Report',
+                  style: appThemeData.textTheme.displayMedium,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _itemNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Item Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(modalContext),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.neutralLight,
+                        foregroundColor: AppColors.neutralDark,
+                      ),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final String itemName = _itemNameController.text.trim();
+                        final String description = _descriptionController.text
+                            .trim();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Report submitted: $itemName${description.isNotEmpty ? ' - $description' : ''}',
+                            ),
+                          ),
+                        );
+                        _itemNameController.clear();
+                        _descriptionController.clear();
+                        Navigator.pop(modalContext);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accentPrimary,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Submit'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    _itemNameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -97,7 +205,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     hintText: 'Search for items...',
                     border: InputBorder.none,
                     filled: false,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 16,
+                    ),
                   ),
                 ),
               ),
@@ -144,9 +255,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                             const SizedBox(height: 8),
                             Text(
                               category['label'],
-                              style: appThemeData.textTheme.bodyText2?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: appThemeData.textTheme.bodyMedium
+                                  ?.copyWith(fontWeight: FontWeight.w600),
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -195,22 +305,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Map',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: AppColors.accentPrimary,

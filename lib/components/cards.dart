@@ -132,14 +132,14 @@ class EnhancedItemCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           title,
-                          style: AppTypography.headline2?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                      style: AppTypography.headline2.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                         ),
                       ),
                       Text(
                         time,
-                        style: AppTypography.bodyText2?.copyWith(
+                        style: AppTypography.bodyText2.copyWith(
                           color: AppColors.neutralMedium,
                           fontSize: 12,
                         ),
@@ -149,7 +149,7 @@ class EnhancedItemCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     subtitle,
-                    style: AppTypography.bodyText2?.copyWith(
+                    style: AppTypography.bodyText2.copyWith(
                       color: AppColors.neutralDark,
                     ),
                   ),

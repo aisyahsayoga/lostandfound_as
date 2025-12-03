@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
-import '../theme/color_palette.dart';
 import '../components/form_fields.dart';
 import '../components/buttons.dart';
-import '../components/buttons.dart';
-import '../components/form_fields.dart';
 import '../components/animations.dart';
-import '../theme/theme_data.dart';
 import '../services/auth_service.dart';
 import 'login.dart';
 import 'demo_home.dart';
