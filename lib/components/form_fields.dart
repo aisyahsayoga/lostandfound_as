@@ -48,12 +48,14 @@ class TextInputField extends StatelessWidget {
 class PhotoUploadField extends StatelessWidget {
   final String label;
   final VoidCallback onUploadPressed;
+  final VoidCallback onUploadFromGalleryPressed;
   final List<String> photoUrls;
 
   const PhotoUploadField({
     Key? key,
     required this.label,
     required this.onUploadPressed,
+    required this.onUploadFromGalleryPressed,
     this.photoUrls = const [],
   }) : super(key: key);
 
@@ -74,11 +76,10 @@ class PhotoUploadField extends StatelessWidget {
           height: 100,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: photoUrls.length + 1,
+            itemCount: photoUrls.length + 2,
             separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               if (index == photoUrls.length) {
-                // Upload button
                 return GestureDetector(
                   onTap: onUploadPressed,
                   child: Container(
@@ -89,6 +90,35 @@ class PhotoUploadField extends StatelessWidget {
                       border: Border.all(color: AppColors.neutralMedium),
                     ),
                     child: const Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
+                  ),
+                );
+              }
+              if (index == photoUrls.length + 1) {
+                return GestureDetector(
+                  onTap: onUploadFromGalleryPressed,
+                  child: Container(
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: AppColors.neutralLight,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.neutralMedium),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.photo_library, size: 28, color: Colors.grey),
+                          const SizedBox(height: 6),
+                          Text(
+                            'add foto',
+                            style: AppTypography.bodyText1.copyWith(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               }

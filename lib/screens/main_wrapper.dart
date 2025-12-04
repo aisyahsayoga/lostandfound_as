@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import 'home_dashboard.dart';
-import 'bookmark_page.dart';
+import 'lost_item_report.dart';
 import 'profile_page.dart';
 
 class MainWrapper extends StatefulWidget {
@@ -13,11 +13,11 @@ class MainWrapper extends StatefulWidget {
 }
 
 class _MainWrapperState extends State<MainWrapper> {
-  int _currentIndex = 1; // default to Home
+  int _currentIndex = 0; // default to Home
 
   final List<Widget> _pages = const [
-    BookmarkPage(),
     HomeDashboardScreen(),
+    LostItemReportScreen(),
     ProfilePage(),
   ];
 
@@ -45,8 +45,8 @@ class _MainWrapperState extends State<MainWrapper> {
         backgroundColor: AppColors.surface,
         elevation: 8,
         items: [
-          _navItem(Icons.bookmark, 'Bookmark'),
           _navItem(Icons.home, 'Home'),
+          _navItem(Icons.add_circle_outline, 'Report'),
           _navItem(Icons.person, 'Profile'),
         ],
       ),

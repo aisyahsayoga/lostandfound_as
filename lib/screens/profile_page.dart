@@ -12,6 +12,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String userName = 'Rafiandra';
   String userEmail = 'rafi@gmail.com';
+  bool darkModeEnabled = false;
+  String languageSelected = 'English';
+  String appVersion = '1.0.0';
 
   Widget _leadingIcon(IconData icon) {
     return Container(
@@ -27,9 +30,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _profileHeaderCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppColors.accentSecondary, AppColors.accentPrimary],
+        ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -39,18 +46,30 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const CircleAvatar(radius: 28, backgroundColor: Colors.blue),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(userName, style: appThemeData.textTheme.bodyLarge),
-                const SizedBox(height: 4),
-                Text(userEmail, style: appThemeData.textTheme.labelSmall),
-              ],
+          const CircleAvatar(
+            radius: 36,
+            backgroundColor: Colors.white,
+            child: Text(
+              'JD',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            userName,
+            style: appThemeData.textTheme.headlineMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            userEmail,
+            style: appThemeData.textTheme.labelSmall?.copyWith(
+              color: Colors.white,
             ),
           ),
         ],
@@ -104,48 +123,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _logoutTile() {
-    return InkWell(
-      onTap: () {
+    return OutlinedButton.icon(
+      onPressed: () {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Logged out')));
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.neutralLight,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(Icons.logout, color: AppColors.error),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Logout',
-                style: appThemeData.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.error,
-                ),
-              ),
-            ),
-          ],
-        ),
+      icon: const Icon(Icons.logout),
+      label: const Text('Log Out'),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.accentPrimary,
+        side: BorderSide(color: AppColors.accentPrimary),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        padding: const EdgeInsets.symmetric(vertical: 14),
       ),
     );
   }
@@ -165,8 +155,10 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           _profileHeaderCard(),
           const SizedBox(height: 24),
+          Text('Account', style: appThemeData.textTheme.headlineSmall),
+          const SizedBox(height: 12),
           _tile(
-            icon: Icons.edit,
+            icon: Icons.person_outline,
             title: 'Edit Profile',
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -176,32 +168,86 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           _tile(
             icon: Icons.assignment,
-            title: 'My Reports',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('My Reports tapped')),
-              );
-            },
-          ),
-          _tile(
-            icon: Icons.settings,
-            title: 'Settings',
+            title: 'My Items',
             onTap: () {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('Settings tapped')));
+              ).showSnackBar(const SnackBar(content: Text('My Items tapped')));
             },
           ),
           _tile(
-            icon: Icons.help_center_outlined,
-            title: 'Help Center',
+            icon: Icons.bookmark_outline,
+            title: 'Saved Items',
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Help Center tapped')),
+                const SnackBar(content: Text('Saved Items tapped')),
               );
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+          Text('Settings', style: appThemeData.textTheme.headlineSmall),
+          const SizedBox(height: 12),
+          _tile(
+            icon: Icons.language,
+            title: 'Language',
+            subtitle: languageSelected,
+            onTap: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Language tapped')));
+            },
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                _leadingIcon(Icons.dark_mode_outlined),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Dark Mode',
+                    style: appThemeData.textTheme.bodyLarge,
+                  ),
+                ),
+                Switch(
+                  value: darkModeEnabled,
+                  onChanged: (v) => setState(() => darkModeEnabled = v),
+                  trackColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return appThemeData.colorScheme.primary.withValues(
+                        alpha: 0.3,
+                      );
+                    }
+                    return Colors.grey.withValues(alpha: 0.3);
+                  }),
+                  thumbColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return appThemeData.colorScheme.primary;
+                    }
+                    return appThemeData.colorScheme.secondary;
+                  }),
+                ),
+              ],
+            ),
+          ),
+          _tile(
+            icon: Icons.info_outline,
+            title: 'Version',
+            subtitle: appVersion,
+          ),
+          const SizedBox(height: 16),
           _logoutTile(),
         ],
       ),

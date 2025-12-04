@@ -6,31 +6,43 @@ class PrimaryButton extends StatelessWidget {
   final String label;
   final void Function() onPressed;
   final bool enabled;
+  final Widget? trailing;
+  final bool fullWidth;
 
   const PrimaryButton({
     Key? key,
     required this.label,
     required this.onPressed,
     this.enabled = true,
+    this.trailing,
+    this.fullWidth = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    final button = ElevatedButton(
       onPressed: enabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.accentPrimary,
         foregroundColor: Colors.white,
-        textStyle: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+        textStyle: AppTypography.bodyLarge.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(fullWidth ? 24 : 12),
         ),
         elevation: enabled ? 6 : 0,
         shadowColor: AppColors.shadow,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
       ),
-      child: Text(label),
+      child: trailing == null
+          ? Text(label)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [Text(label), const SizedBox(width: 8), trailing!],
+            ),
     );
+    return fullWidth ? SizedBox(width: double.infinity, child: button) : button;
   }
 }
 
@@ -66,7 +78,9 @@ class SecondaryButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.accentPrimary,
           side: BorderSide(color: AppColors.accentPrimary, width: 2),
-          textStyle: AppTypography.bodyText1.copyWith(fontWeight: FontWeight.w700),
+          textStyle: AppTypography.bodyText1.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

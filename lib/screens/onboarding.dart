@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
+import '../theme/color_palette.dart';
 import '../components/buttons.dart';
 import '../components/animations.dart';
 import 'main_wrapper.dart';
@@ -15,20 +16,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, String>> _pages = [
+  final List<Map<String, dynamic>> _pages = [
     {
-      'title': 'Welcome to Lost & Found',
+      'icon': Icons.search,
+      'title': 'Find Lost Items',
       'description':
-          'Find lost items or upload found items quickly and easily.',
+          "Search through thousands of lost items reported by the community. Filter by category, location, and date to find what you're looking for.",
     },
     {
-      'title': 'Report Lost Items',
-      'description': 'Fill out a simple form to let others know what you lost.',
+      'icon': Icons.add_circle_outline,
+      'title': 'Report Found Items',
+      'description':
+          'Found something? Help reunite it with its owner by reporting it on our platform. Upload photos and location details.',
     },
     {
-      'title': 'Upload Found Items',
+      'icon': Icons.group_outlined,
+      'title': 'Connect & Reunite',
       'description':
-          'Help reunite items with their owners by uploading found items.',
+          'Connect with item owners or finders directly. Our secure platform makes it easy to return lost items to their rightful owners.',
     },
   ];
 
@@ -52,16 +57,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  Widget _buildPageContent(Map<String, String> page) {
+  Widget _buildIconBadge(IconData icon) {
+    return Container(
+      width: 96,
+      height: 96,
+      decoration: BoxDecoration(
+        color: AppColors.neutralLight.withValues(alpha: 0.4),
+        shape: BoxShape.circle,
+      ),
+      alignment: Alignment.center,
+      child: Icon(icon, size: 40, color: AppColors.accentPrimary),
+    );
+  }
+
+  Widget _buildPageContent(Map<String, dynamic> page) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 60),
+          FadeIn(child: _buildIconBadge(page['icon'] as IconData)),
+          const SizedBox(height: 36),
           FadeIn(
             child: Text(
               page['title'] ?? '',
-              style: appThemeData.textTheme.displayLarge,
+              style: appThemeData.textTheme.headlineLarge,
               textAlign: TextAlign.center,
             ),
           ),
@@ -69,10 +90,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           FadeIn(
             child: Text(
               page['description'] ?? '',
-              style: appThemeData.textTheme.bodyLarge,
+              style: appThemeData.textTheme.bodyLarge!.copyWith(
+                color: AppColors.neutralDark.withValues(alpha: 0.8),
+              ),
               textAlign: TextAlign.center,
             ),
           ),
+          const Spacer(),
         ],
       ),
     );
@@ -111,6 +135,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       backgroundColor: appThemeData.scaffoldBackgroundColor,
       body: Column(
         children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainWrapper(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Skip',
+                      style: appThemeData.textTheme.bodyMedium!.copyWith(
+                        color: AppColors.neutralDark,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: PageView.builder(
               controller: _pageController,
@@ -127,7 +177,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             child: PrimaryButton(
               label: _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
+              trailing: _currentPage == _pages.length - 1
+                  ? const Icon(Icons.arrow_right_alt)
+                  : null,
               onPressed: _nextPage,
+              fullWidth: true,
             ),
           ),
           const SizedBox(height: 24),

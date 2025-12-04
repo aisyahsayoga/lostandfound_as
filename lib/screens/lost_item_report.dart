@@ -3,7 +3,6 @@ import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import '../components/form_fields.dart';
 import '../components/buttons.dart';
-import '../components/animations.dart';
 
 class LostItemReportScreen extends StatefulWidget {
   const LostItemReportScreen({Key? key}) : super(key: key);
@@ -13,205 +12,172 @@ class LostItemReportScreen extends StatefulWidget {
 }
 
 class _LostItemReportScreenState extends State<LostItemReportScreen> {
-  int _currentStep = 0;
-
   final TextEditingController itemNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
   String? selectedCategory;
-  DateTime? timeOfLoss;
-  // For location and photos, placeholders for now
-  String? lastSeenLocation;
+  DateTime? reportDate;
+  bool isFound = false; // false = Lost, true = Found
   List<String> photoUrls = [];
 
   final List<String> categories = [
     'Electronics',
     'Personal Items',
     'Documents',
-    'Pets',
+    'Apparel',
   ];
 
-  void _onNext() {
-    if (_currentStep < 4) {
-      setState(() {
-        _currentStep++;
-      });
-    } else {
-      // TODO: Submit form data
-    }
-  }
-
-  void _onBack() {
-    if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
-    }
-  }
-
-  Future<void> _selectDateTime() async {
+  Future<void> _selectDate() async {
     final date = await showDatePicker(
       context: context,
-      initialDate: timeOfLoss ?? DateTime.now(),
+      initialDate: reportDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
     if (date == null) return;
-
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(timeOfLoss ?? DateTime.now()),
-    );
-    if (time == null) return;
-
     setState(() {
-      timeOfLoss = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        time.hour,
-        time.minute,
-      );
+      reportDate = DateTime(date.year, date.month, date.day);
     });
   }
 
-  Widget _buildStepContent() {
-    switch (_currentStep) {
-      case 0:
-        return TextInputField(
-          label: 'Item Name',
-          controller: itemNameController,
-          hintText: 'Name of the lost item',
-        );
-      case 1:
-        return TextInputField(
-          label: 'Description',
-          controller: descriptionController,
-          hintText: 'Describe the item',
-          multiline: true,
-        );
-      case 2:
-        return DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: 'Category/Type',
-            filled: true,
-            fillColor: AppColors.neutralLight,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-          initialValue: selectedCategory,
-          items: categories.map((cat) {
-            return DropdownMenuItem<String>(value: cat, child: Text(cat));
-          }).toList(),
-          onChanged: (val) => setState(() => selectedCategory = val),
-        );
-      case 3:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  String _formatDate(DateTime? d) {
+    if (d == null) return 'Select date';
+    final mm = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    return '${d.year}-$mm-$dd';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Report Lost or Found Item'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: ListView(
           children: [
-            Text(
-              'Last Seen Location',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ChoiceChip(
+                  label: const Text('Lost'),
+                  selected: !isFound,
+                  onSelected: (_) => setState(() => isFound = false),
+                ),
+                const SizedBox(width: 12),
+                ChoiceChip(
+                  label: const Text('Found'),
+                  selected: isFound,
+                  onSelected: (_) => setState(() => isFound = true),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                // TODO: Implement map location picker
-              },
-              child: Container(
-                height: 160,
-                decoration: BoxDecoration(
-                  color: AppColors.neutralLight,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.neutralMedium),
-                ),
-                child: Center(
-                  child: Text(lastSeenLocation ?? 'Select location on map'),
-                ),
+            const SizedBox(height: 24),
+            TextInputField(
+              label: 'Item Name',
+              controller: itemNameController,
+              hintText: isFound
+                  ? 'Name of the found item'
+                  : 'Name of the lost item',
+            ),
+            const SizedBox(height: 16),
+            TextInputField(
+              label: 'Description',
+              controller: descriptionController,
+              hintText: 'Describe the item',
+              multiline: true,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Category/Type',
+              style: appThemeData.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ],
-        );
-      case 4:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: AppColors.neutralLight,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              hint: Text(
+                'Select category/type',
+                style: appThemeData.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.neutralMedium,
+                ),
+              ),
+              initialValue: selectedCategory,
+              items: categories
+                  .map(
+                    (cat) =>
+                        DropdownMenuItem<String>(value: cat, child: Text(cat)),
+                  )
+                  .toList(),
+              onChanged: (val) => setState(() => selectedCategory = val),
+            ),
+            const SizedBox(height: 16),
             Text(
-              'Time of Loss',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+              isFound ? 'Date Found' : 'Date of Loss',
+              style: appThemeData.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 8),
             GestureDetector(
-              onTap: _selectDateTime,
+              onTap: _selectDate,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   color: AppColors.neutralLight,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.neutralMedium),
                 ),
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  timeOfLoss != null
-                      ? timeOfLoss.toString()
-                      : 'Select time of loss',
+                  _formatDate(reportDate),
+                  style: (reportDate == null)
+                      ? appThemeData.textTheme.bodyMedium?.copyWith(
+                          color: AppColors.neutralMedium,
+                        )
+                      : appThemeData.textTheme.bodyLarge,
                 ),
               ),
+            ),
+            const SizedBox(height: 16),
+            TextInputField(
+              label: isFound ? 'Item Found at' : 'Last seen location',
+              controller: locationController,
+              hintText: isFound
+                  ? 'e.g., Lab Computer Room'
+                  : 'e.g., Theater or Sahabat',
             ),
             const SizedBox(height: 24),
             PhotoUploadField(
               label: 'Photos',
-              onUploadPressed: () {
-                // TODO: Implement photo upload
-              },
+              onUploadPressed: () {},
+              onUploadFromGalleryPressed: () {},
               photoUrls: photoUrls,
             ),
-          ],
-        );
-      default:
-        return Container();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isLastStep = _currentStep == 4;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Report Lost Item'),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Step ${_currentStep + 1} of 5',
-              style: appThemeData.textTheme.bodyMedium,
-            ),
             const SizedBox(height: 24),
-            Expanded(child: FadeIn(child: _buildStepContent())),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_currentStep > 0)
-                  SecondaryButton(label: 'Back', onPressed: _onBack)
-                else
-                  const SizedBox(width: 100),
-                PrimaryButton(
-                  label: isLastStep ? 'Submit' : 'Next',
-                  onPressed: _onNext,
-                ),
-              ],
+            PrimaryButton(
+              label: 'Submit',
+              fullWidth: true,
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${isFound ? 'Found' : 'Lost'} report submitted for: ${itemNameController.text.trim()}',
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
