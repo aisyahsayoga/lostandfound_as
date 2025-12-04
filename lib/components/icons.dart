@@ -13,8 +13,8 @@ class AppIcons {
   static Icon categoryDocuments({Color color = AppColors.accentPrimary}) =>
       Icon(Icons.description, size: iconSize, color: color);
 
-  static Icon categoryPets({Color color = AppColors.accentPrimary}) =>
-      Icon(Icons.pets, size: iconSize, color: color);
+  static Icon categoryApparel({Color color = AppColors.accentPrimary}) =>
+      Icon(Icons.checkroom, size: iconSize, color: color);
 
   static Icon search({Color color = AppColors.neutralMedium}) =>
       Icon(Icons.search, size: iconSize, color: color);

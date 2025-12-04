@@ -100,7 +100,7 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
               borderSide: BorderSide.none,
             ),
           ),
-          value: selectedCategory,
+          initialValue: selectedCategory,
           items: categories.map((cat) {
             return DropdownMenuItem<String>(value: cat, child: Text(cat));
           }).toList(),

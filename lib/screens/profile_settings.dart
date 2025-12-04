@@ -49,7 +49,20 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     title: const Text('Enable Notifications'),
                     value: notificationsEnabled,
                     onChanged: _toggleNotifications,
-                    activeColor: appThemeData.colorScheme.primary,
+                    trackColor: MaterialStateProperty.resolveWith((states) {
+                      if (states.contains(MaterialState.selected)) {
+                        return appThemeData.colorScheme.primary.withOpacity(
+                          0.3,
+                        );
+                      }
+                      return Colors.grey.withOpacity(0.3);
+                    }),
+                    thumbColor: MaterialStateProperty.resolveWith((states) {
+                      if (states.contains(MaterialState.selected)) {
+                        return appThemeData.colorScheme.primary;
+                      }
+                      return appThemeData.colorScheme.secondary;
+                    }),
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -63,7 +76,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () => _onItemTap(item),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

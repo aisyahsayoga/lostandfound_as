@@ -13,16 +13,18 @@ class HomeDashboardScreen extends StatefulWidget {
 }
 
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
-  int _selectedIndex = 0;
   final TextEditingController searchController = TextEditingController();
   final TextEditingController _itemNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  int foundCount = 12;
+  int lostCount = 8;
+  int resolvedCount = 5;
 
   final List<Map<String, dynamic>> categories = [
     {'label': 'Electronics', 'icon': AppIcons.categoryElectronics()},
     {'label': 'Personal Items', 'icon': AppIcons.categoryPersonal()},
     {'label': 'Documents', 'icon': AppIcons.categoryDocuments()},
-    {'label': 'Pets', 'icon': AppIcons.categoryPets()},
+    {'label': 'Apparel', 'icon': AppIcons.categoryApparel()},
   ];
 
   final List<Map<String, String>> recentItems = [
@@ -45,7 +47,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   void _onCategorySelected(String category) {
     setState(() {
       final filteredItems = recentItems.where((item) {
-        final statusToCategory = {'Lost': 'Personal Items', 'Found': 'Pets'};
+        final statusToCategory = {'Lost': 'Personal Items', 'Found': 'Apparel'};
         return statusToCategory[item['status']] == category;
       }).toList();
       recentItems
@@ -58,24 +60,47 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     Navigator.pushNamed(context, '/item-details', arguments: {'title': title});
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    switch (index) {
-      case 0:
-        // Already on HomeDashboardScreen
-        break;
-      case 1:
-        Navigator.pushNamed(context, '/search');
-        break;
-      case 2:
-        Navigator.pushNamed(context, '/map');
-        break;
-      case 3:
-        Navigator.pushNamed(context, '/profile');
-        break;
-    }
+  // Removed local bottom navigation handling; navigation is managed by MainWrapper
+
+  Widget _metricCard({
+    required IconData icon,
+    required String label,
+    required int value,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.neutralLight,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: AppColors.accentSecondary),
+            ),
+            const SizedBox(height: 12),
+            Text('$value', style: appThemeData.textTheme.displaySmall),
+            const SizedBox(height: 4),
+            Text(label, style: appThemeData.textTheme.labelLarge),
+          ],
+        ),
+      ),
+    );
   }
 
   void _onFabPressed() {
@@ -214,6 +239,28 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            Row(
+              children: [
+                _metricCard(
+                  icon: Icons.check_circle_outline,
+                  label: 'Resolved',
+                  value: resolvedCount,
+                ),
+                const SizedBox(width: 12),
+                _metricCard(
+                  icon: Icons.search,
+                  label: 'Lost',
+                  value: lostCount,
+                ),
+                const SizedBox(width: 12),
+                _metricCard(
+                  icon: Icons.inventory_2_outlined,
+                  label: 'Found',
+                  value: foundCount,
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             FadeIn(
               child: Text(
                 'Categories',
@@ -297,26 +344,14 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _onFabPressed,
-        backgroundColor: AppColors.accentPrimary,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: AppColors.accentSecondary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Report'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 8,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.accentPrimary,
-        unselectedItemColor: AppColors.neutralMedium,
-        onTap: _onItemTapped,
-        backgroundColor: AppColors.surface,
-        elevation: 8,
-        type: BottomNavigationBarType.fixed,
       ),
     );
   }

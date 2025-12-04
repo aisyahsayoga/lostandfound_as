@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
 import '../components/buttons.dart';
 import '../components/animations.dart';
-import 'home_dashboard.dart';
+import 'main_wrapper.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -41,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeDashboardScreen()),
+        MaterialPageRoute(builder: (context) => const MainWrapper()),
       );
     }
   }
@@ -91,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           decoration: BoxDecoration(
             color: _currentPage == index
                 ? appThemeData.colorScheme.primary
-                : appThemeData.colorScheme.primary.withOpacity(0.3),
+                : appThemeData.colorScheme.primary.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(12),
           ),
         ),

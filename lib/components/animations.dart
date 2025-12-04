@@ -6,14 +6,14 @@ class FadeIn extends StatefulWidget {
   final Curve curve;
 
   const FadeIn({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeInOut,
-  }) : super(key: key);
+  });
 
   @override
-  _FadeInState createState() => _FadeInState();
+  State<FadeIn> createState() => _FadeInState();
 }
 
 class _FadeInState extends State<FadeIn> with SingleTickerProviderStateMixin {
@@ -50,15 +50,15 @@ class ScaleOnTap extends StatefulWidget {
   final Duration duration;
 
   const ScaleOnTap({
-    Key? key,
+    super.key,
     required this.child,
     this.onTap,
     this.scaleFactor = 0.95,
     this.duration = const Duration(milliseconds: 100),
-  }) : super(key: key);
+  });
 
   @override
-  _ScaleOnTapState createState() => _ScaleOnTapState();
+  State<ScaleOnTap> createState() => _ScaleOnTapState();
 }
 
 class _ScaleOnTapState extends State<ScaleOnTap> with SingleTickerProviderStateMixin {
@@ -116,14 +116,14 @@ class SlideInFromBottom extends StatefulWidget {
   final Curve curve;
 
   const SlideInFromBottom({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeOut,
-  }) : super(key: key);
+  });
 
   @override
-  _SlideInFromBottomState createState() => _SlideInFromBottomState();
+  State<SlideInFromBottom> createState() => _SlideInFromBottomState();
 }
 
 class _SlideInFromBottomState extends State<SlideInFromBottom> with SingleTickerProviderStateMixin {
@@ -162,14 +162,14 @@ class BounceIn extends StatefulWidget {
   final Curve curve;
 
   const BounceIn({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 800),
     this.curve = Curves.elasticOut,
-  }) : super(key: key);
+  });
 
   @override
-  _BounceInState createState() => _BounceInState();
+  State<BounceIn> createState() => _BounceInState();
 }
 
 class _BounceInState extends State<BounceIn> with SingleTickerProviderStateMixin {

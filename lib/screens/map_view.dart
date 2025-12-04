@@ -78,7 +78,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    value: selectedCategory,
+                    initialValue: selectedCategory,
                     items: categories.map((cat) {
                       return DropdownMenuItem<String>(
                         value: cat,
@@ -100,7 +100,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    value: selectedTime,
+                    initialValue: selectedTime,
                     items: times.map((time) {
                       return DropdownMenuItem<String>(
                         value: time,
