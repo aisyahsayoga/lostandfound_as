@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'theme/theme_data.dart';
 import 'screens/onboarding.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // <-- Wajib ada
+  await Firebase.initializeApp(); // <-- Inisialisasi Firebase (tanpa options)
   runApp(const MyApp());
 }
 

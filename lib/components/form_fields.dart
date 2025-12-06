@@ -35,9 +35,7 @@ class TextInputField extends StatelessWidget {
           controller: controller,
           maxLines: multiline ? null : 1,
           keyboardType: keyboardType,
-          decoration: InputDecoration(
-            hintText: hintText,
-          ),
+          decoration: InputDecoration(hintText: hintText),
           style: AppTypography.bodyLarge,
         ),
       ],
@@ -89,7 +87,11 @@ class PhotoUploadField extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AppColors.neutralMedium),
                     ),
-                    child: const Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
+                    child: const Icon(
+                      Icons.add_a_photo,
+                      size: 32,
+                      color: Colors.grey,
+                    ),
                   ),
                 );
               }
@@ -107,7 +109,11 @@ class PhotoUploadField extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.photo_library, size: 28, color: Colors.grey),
+                          const Icon(
+                            Icons.photo_library,
+                            size: 28,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(height: 6),
                           Text(
                             'add foto',
@@ -125,7 +131,12 @@ class PhotoUploadField extends StatelessWidget {
               final photoUrl = photoUrls[index];
               return ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(photoUrl, width: 100, height: 100, fit: BoxFit.cover),
+                child: Image.network(
+                  photoUrl,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
               );
             },
           ),

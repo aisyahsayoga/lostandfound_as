@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import '../components/form_fields.dart';
@@ -169,14 +171,71 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
             PrimaryButton(
               label: 'Submit',
               fullWidth: true,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      '${isFound ? 'Found' : 'Lost'} report submitted for: ${itemNameController.text.trim()}',
+              onPressed: () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('You must be logged in to submit a report'),
                     ),
-                  ),
+                  );
+                  return;
+                }
+
+                final name = itemNameController.text.trim();
+                final desc = descriptionController.text.trim();
+                final loc = locationController.text.trim();
+                if (name.isEmpty ||
+                    desc.isEmpty ||
+                    selectedCategory == null ||
+                    reportDate == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill all required fields'),
+                    ),
+                  );
+                  return;
+                }
+
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) =>
+                      const Center(child: CircularProgressIndicator()),
                 );
+
+                try {
+                  final data = {
+                    'itemName': name,
+                    'description': desc,
+                    'category': selectedCategory,
+                    'location': loc,
+                    'reportDate': reportDate,
+                    'isFound': isFound,
+                    'createdAt': FieldValue.serverTimestamp(),
+                    'reporterId': user.uid,
+                    'photos': photoUrls,
+                  };
+                  await FirebaseFirestore.instance
+                      .collection('items')
+                      .add(data);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Report submitted successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to submit: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
             ),
           ],
