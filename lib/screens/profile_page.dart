@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'my_reports_screen.dart';
+import 'main_wrapper.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -10,8 +13,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String userName = 'Rafiandra';
-  String userEmail = 'rafi@gmail.com';
+  String userName = 'Guest';
+  String userEmail = '';
   bool darkModeEnabled = false;
   String languageSelected = 'English';
   String appVersion = '1.0.0';
@@ -29,6 +32,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _profileHeaderCard() {
+    final user = FirebaseAuth.instance.currentUser;
+    final displayName = user?.displayName;
+    final email = user?.email;
+    final initials = (displayName ?? 'Guest')
+        .split(' ')
+        .where((p) => p.isNotEmpty)
+        .map((p) => p[0])
+        .take(2)
+        .join()
+        .toUpperCase();
+    final nameText = displayName ?? userName;
+    final emailText = email ?? userEmail;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
@@ -49,17 +64,17 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 36,
             backgroundColor: Colors.white,
             child: Text(
-              'JD',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              initials.isEmpty ? 'G' : initials,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            userName,
+            nameText,
             style: appThemeData.textTheme.headlineMedium?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w600,
@@ -67,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 4),
           Text(
-            userEmail,
+            emailText.isEmpty ? 'Guest Mode' : emailText,
             style: appThemeData.textTheme.labelSmall?.copyWith(
               color: Colors.white,
             ),
@@ -124,10 +139,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _logoutTile() {
     return OutlinedButton.icon(
-      onPressed: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Logged out')));
+      onPressed: () async {
+        await FirebaseAuth.instance.signOut();
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainWrapper()),
+          (route) => false,
+        );
       },
       icon: const Icon(Icons.logout),
       label: const Text('Log Out'),
@@ -168,11 +186,12 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           _tile(
             icon: Icons.assignment,
-            title: 'My Items',
+            title: 'My Reports',
             onTap: () {
-              ScaffoldMessenger.of(
+              Navigator.push(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('My Items tapped')));
+                MaterialPageRoute(builder: (_) => const MyReportsScreen()),
+              );
             },
           ),
           _tile(

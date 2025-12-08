@@ -4,6 +4,8 @@ import '../theme/color_palette.dart';
 import 'home_dashboard.dart';
 import 'lost_item_report.dart';
 import 'profile_page.dart';
+import 'onboarding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({Key? key}) : super(key: key);
@@ -13,7 +15,22 @@ class MainWrapper extends StatefulWidget {
 }
 
 class _MainWrapperState extends State<MainWrapper> {
-  int _currentIndex = 0; // default to Home
+  int _currentIndex = 0;
+  bool? _hasSeenOnboarding;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOnboardingFlag();
+  }
+
+  Future<void> _loadOnboardingFlag() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('hasSeenOnboarding') ?? false;
+    setState(() {
+      _hasSeenOnboarding = seen;
+    });
+  }
 
   final List<Widget> _pages = const [
     HomeDashboardScreen(),
@@ -33,6 +50,12 @@ class _MainWrapperState extends State<MainWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    if (_hasSeenOnboarding == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (_hasSeenOnboarding == false) {
+      return const OnboardingScreen();
+    }
     return Scaffold(
       backgroundColor: appThemeData.scaffoldBackgroundColor,
       body: _pages[_currentIndex],

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'theme/theme_data.dart';
 import 'screens/onboarding.dart';
+import 'screens/main_wrapper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // <-- Wajib ada
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Lost & Found',
       theme: appThemeData,
-      home: OnboardingScreen(),
+      home: const MainWrapper(),
       debugShowCheckedModeBanner: false,
     );
   }

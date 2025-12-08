@@ -5,7 +5,7 @@ import '../components/buttons.dart';
 import '../components/animations.dart';
 import '../services/auth_service.dart';
 import 'login.dart';
-import 'demo_home.dart';
+import 'item_list_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -18,7 +18,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  bool _isPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
 
   void _onSignUpPressed() async {
     try {
@@ -34,17 +37,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Akun berhasil dibuat!')),
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const DemoHomeScreen()),
-          );
+          Navigator.of(context).pop();
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -97,6 +97,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   hintText: 'Create a password',
                   controller: passwordController,
                   keyboardType: TextInputType.visiblePassword,
+                  obscureText: _isPasswordObscured,
+                  onToggleObscure: () => setState(
+                    () => _isPasswordObscured = !_isPasswordObscured,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -106,6 +110,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   hintText: 'Re-enter your password',
                   controller: confirmPasswordController,
                   keyboardType: TextInputType.visiblePassword,
+                  obscureText: _isConfirmPasswordObscured,
+                  onToggleObscure: () => setState(
+                    () => _isConfirmPasswordObscured =
+                        !_isConfirmPasswordObscured,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),

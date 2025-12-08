@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import 'lost_item_report.dart';
 import 'item_detail_screen.dart';
+import 'login.dart';
 
 class ItemListScreen extends StatefulWidget {
   const ItemListScreen({Key? key}) : super(key: key);
@@ -51,12 +53,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LostItemReportScreen()),
-              );
-            },
+            onPressed: _onAddButtonPressed,
           ),
         ],
       ),
@@ -69,7 +66,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
           if (snapshot.hasError) {
             return Center(
               child: Text(
-                'Error: ${snapshot.error}',
+                'An error occurred',
                 style: appThemeData.textTheme.bodyLarge,
               ),
             );
@@ -95,7 +92,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
 
               return Card(
                 elevation: 6,
-                margin: const EdgeInsets.symmetric(vertical: 8),
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                 shadowColor: AppColors.shadow,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -106,51 +103,44 @@ class _ItemListScreenState extends State<ItemListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            ItemDetailScreen(documentId: docs[index].id),
+                        builder: (_) => ItemDetailScreen(documentId: docs[index].id),
                       ),
                     );
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
+                    padding: const EdgeInsets.all(8),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(8),
+                      leading: SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: Container(
                           decoration: BoxDecoration(
                             color: AppColors.neutralLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey,
-                          ),
+                          child: const Icon(Icons.camera_alt, color: Colors.grey),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                itemName,
-                                style: appThemeData.textTheme.headlineSmall,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Last seen at: $location',
-                                style: appThemeData.textTheme.bodyMedium,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Reported on: $reportDate',
-                                style: appThemeData.textTheme.bodySmall,
-                              ),
-                            ],
-                          ),
+                      ),
+                      title: Text(
+                        itemName,
+                        style: appThemeData.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Last seen at: $location',
+                            style: appThemeData.textTheme.bodyMedium,
+                          ),
+                          Text(
+                            'Reported on: $reportDate',
+                            style: appThemeData.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -160,5 +150,27 @@ class _ItemListScreenState extends State<ItemListScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _onAddButtonPressed() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
+    if (FirebaseAuth.instance.currentUser != null) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LostItemReportScreen()),
+      );
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Silakan login untuk membuat laporan.')),
+      );
+    }
   }
 }

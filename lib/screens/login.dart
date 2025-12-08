@@ -5,7 +5,7 @@ import '../components/animations.dart';
 import '../theme/theme_data.dart';
 import '../theme/typography.dart';
 import '../services/auth_service.dart';
-import 'demo_home.dart';
+import 'item_list_screen.dart';
 import 'sign_up.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,6 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isPasswordObscured = true;
 
   void _onLoginPressed() async {
     try {
@@ -28,20 +29,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (success) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login berhasil!')),
-          );
-          Navigator.pushReplacement(
+          ScaffoldMessenger.of(
             context,
-            MaterialPageRoute(builder: (context) => const DemoHomeScreen()),
-          );
+          ).showSnackBar(const SnackBar(content: Text('Login berhasil!')));
+          Navigator.of(context).pop();
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -98,6 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   hintText: 'Enter your password',
                   controller: passwordController,
                   keyboardType: TextInputType.visiblePassword,
+                  obscureText: _isPasswordObscured,
+                  onToggleObscure: () => setState(
+                    () => _isPasswordObscured = !_isPasswordObscured,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),

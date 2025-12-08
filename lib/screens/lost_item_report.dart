@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import '../components/form_fields.dart';
@@ -21,6 +24,7 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
   DateTime? reportDate;
   bool isFound = false; // false = Lost, true = Found
   List<String> photoUrls = [];
+  final List<XFile> _selectedImages = [];
 
   final List<String> categories = [
     'Electronics',
@@ -47,6 +51,16 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
     final mm = d.month.toString().padLeft(2, '0');
     final dd = d.day.toString().padLeft(2, '0');
     return '${d.year}-$mm-$dd';
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: source, imageQuality: 85);
+    if (file != null) {
+      setState(() {
+        _selectedImages.add(file);
+      });
+    }
   }
 
   @override
@@ -163,9 +177,10 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
             const SizedBox(height: 24),
             PhotoUploadField(
               label: 'Photos',
-              onUploadPressed: () {},
-              onUploadFromGalleryPressed: () {},
+              onUploadPressed: () => _pickImage(ImageSource.camera),
+              onUploadFromGalleryPressed: () => _pickImage(ImageSource.gallery),
               photoUrls: photoUrls,
+              localImagePaths: _selectedImages.map((x) => x.path).toList(),
             ),
             const SizedBox(height: 24),
             PrimaryButton(
@@ -205,6 +220,17 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                 );
 
                 try {
+                  final uploaded = <String>[];
+                  for (var i = 0; i < _selectedImages.length; i++) {
+                    final x = _selectedImages[i];
+                    final ref = FirebaseStorage.instance.ref().child(
+                      'item_photos/${user.uid}/${DateTime.now().toIso8601String()}_$i.jpg',
+                    );
+                    await ref.putFile(File(x.path));
+                    final url = await ref.getDownloadURL();
+                    uploaded.add(url);
+                  }
+
                   final data = {
                     'itemName': name,
                     'description': desc,
@@ -214,11 +240,12 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                     'isFound': isFound,
                     'createdAt': FieldValue.serverTimestamp(),
                     'reporterId': user.uid,
-                    'photos': photoUrls,
+                    'photoUrls': uploaded,
                   };
                   await FirebaseFirestore.instance
                       .collection('items')
                       .add(data);
+                  if (!mounted) return;
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -228,6 +255,7 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                     ),
                   );
                 } catch (e) {
+                  if (!mounted) return;
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
