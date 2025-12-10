@@ -343,17 +343,36 @@ class AuthService {
   }
 
   Future<Map<String, int>> getItemCounts() async {
-    final lost = await _databases.listDocuments(
-      databaseId: _databaseId,
-      collectionId: _itemsCollectionId,
-      queries: [Query.equal('isFound', false), Query.limit(1)],
-    );
-    final found = await _databases.listDocuments(
-      databaseId: _databaseId,
-      collectionId: _itemsCollectionId,
-      queries: [Query.equal('isFound', true), Query.limit(1)],
-    );
-    return {'lost': lost.total, 'found': found.total, 'resolved': 0};
+    try {
+      final lost = await _databases.listDocuments(
+        databaseId: _databaseId,
+        collectionId: _itemsCollectionId,
+        queries: [Query.equal('isFound', false), Query.limit(1)],
+      );
+      final found = await _databases.listDocuments(
+        databaseId: _databaseId,
+        collectionId: _itemsCollectionId,
+        queries: [Query.equal('isFound', true), Query.limit(1)],
+      );
+      int resolvedTotal = 0;
+      try {
+        final resolved = await _databases.listDocuments(
+          databaseId: _databaseId,
+          collectionId: _itemsCollectionId,
+          queries: [Query.equal('isResolved', true), Query.limit(1)],
+        );
+        resolvedTotal = resolved.total;
+      } catch (_) {
+        resolvedTotal = 0;
+      }
+      return {
+        'lost': lost.total,
+        'found': found.total,
+        'resolved': resolvedTotal,
+      };
+    } catch (_) {
+      return {'lost': 0, 'found': 0, 'resolved': 0};
+    }
   }
 
   Future<List<Models.Document>> listMyReports() async {
@@ -390,6 +409,7 @@ class AuthService {
         'location': location,
         'reportDate': reportDate.toIso8601String(),
         'isFound': isFound,
+        'isResolved': false,
         'imageIds': imageIds ?? [],
         'reporterId': _currentUser!.id,
         'createdAt': DateTime.now().toIso8601String(),
@@ -432,6 +452,15 @@ class AuthService {
       collectionId: _itemsCollectionId,
       documentId: documentId,
       data: {'isFound': true},
+    );
+  }
+
+  Future<void> markItemResolved(String documentId) async {
+    await _databases.updateDocument(
+      databaseId: _databaseId,
+      collectionId: _itemsCollectionId,
+      documentId: documentId,
+      data: {'isResolved': true},
     );
   }
 }

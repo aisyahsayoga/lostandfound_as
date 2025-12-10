@@ -212,69 +212,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     : null,
               ),
               // Saved Items dihapus sesuai spesifikasi
-              const SizedBox(height: 24),
-              Text('Settings', style: appThemeData.textTheme.headlineSmall),
-              const SizedBox(height: 12),
-              _tile(
-                icon: Icons.language,
-                title: 'Language',
-                subtitle: languageSelected,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Language tapped')),
-                  );
-                },
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    _leadingIcon(Icons.dark_mode_outlined),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Dark Mode',
-                        style: appThemeData.textTheme.bodyLarge,
-                      ),
-                    ),
-                    Switch(
-                      value: darkModeEnabled,
-                      onChanged: (v) => setState(() => darkModeEnabled = v),
-                      trackColor: WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.selected)) {
-                          return appThemeData.colorScheme.primary.withValues(
-                            alpha: 0.3,
-                          );
-                        }
-                        return Colors.grey.withValues(alpha: 0.3);
-                      }),
-                      thumbColor: WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.selected)) {
-                          return appThemeData.colorScheme.primary;
-                        }
-                        return appThemeData.colorScheme.secondary;
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-              _tile(
-                icon: Icons.info_outline,
-                title: 'Version',
-                subtitle: appVersion,
-              ),
+              
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),

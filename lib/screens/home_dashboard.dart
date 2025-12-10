@@ -14,7 +14,6 @@ class HomeDashboardScreen extends StatefulWidget {
 }
 
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
-  final TextEditingController searchController = TextEditingController();
   int foundCount = 0;
   int lostCount = 0;
   int resolvedCount = 0;
@@ -108,7 +107,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   @override
   void dispose() {
-    searchController.dispose();
     super.dispose();
   }
 
@@ -131,34 +129,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             _loading
                 ? const LinearProgressIndicator(minHeight: 2)
                 : const SizedBox.shrink(),
-            FadeIn(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    prefixIcon: AppIcons.search(),
-                    hintText: 'Search for items...',
-                    border: InputBorder.none,
-                    filled: false,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+
             const SizedBox(height: 24),
             Row(
               children: [
@@ -260,7 +231,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                childAspectRatio: 0.75,
+                childAspectRatio: 1.1,
               ),
               itemCount: recentDocs.length,
               itemBuilder: (context, index) {
@@ -269,6 +240,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 final isFound = data['isFound'] == true;
                 final status = isFound ? 'Found' : 'Lost';
                 final tint = _statusTint(status);
+                final isResolved = data['isResolved'] == true;
+                final rowTint = isResolved
+                    ? AppColors.success.withValues(alpha: 0.12)
+                    : tint;
+                final chipText = isResolved ? 'Resolved' : status;
                 final title = (data['title'] ?? 'Untitled').toString();
                 final location = (data['location'] ?? '-').toString();
                 String? thumb;
@@ -282,7 +258,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: tint,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
@@ -298,37 +274,68 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           children: [
                             if (thumb != null)
                               SizedBox(
-                                height: 100,
+                                height: 92,
                                 width: double.infinity,
                                 child: Image.network(thumb, fit: BoxFit.cover),
+                              )
+                            else
+                              Container(
+                                height: 92,
+                                width: double.infinity,
+                                color: AppColors.neutralLight,
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.image,
+                                  color: AppColors.neutralMedium,
+                                  size: 28,
+                                ),
                               ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            Container(
+                              width: double.infinity,
+                              color: rowTint,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          title,
+                                          style:
+                                              appThemeData.textTheme.bodyLarge,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          location,
+                                          style:
+                                              appThemeData.textTheme.labelSmall,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
+                                      horizontal: 8,
+                                      vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      status,
-                                      style: appThemeData.textTheme.labelLarge,
+                                      chipText,
+                                      style: appThemeData.textTheme.labelSmall,
                                     ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    title,
-                                    style: appThemeData.textTheme.bodyLarge,
-                                  ),
-                                  Text(
-                                    location,
-                                    style: appThemeData.textTheme.labelSmall,
                                   ),
                                 ],
                               ),
@@ -336,19 +343,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                           ],
                         ),
                       ),
-                      Positioned(
-                        top: 12,
-                        right: 12,
-                        child: Material(
-                          color: Colors.white,
-                          shape: const CircleBorder(),
-                          elevation: 2,
-                          child: IconButton(
-                            icon: const Icon(Icons.bookmark_border),
-                            onPressed: () {},
-                          ),
-                        ),
-                      ),
+                      // bookmark removed
                     ],
                   ),
                 );

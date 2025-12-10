@@ -6,6 +6,7 @@ import 'lost_item_report.dart';
 import 'profile_page.dart';
 import 'onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
 
 class MainWrapper extends StatefulWidget {
   final int initialIndex;
@@ -52,11 +53,14 @@ class _MainWrapperState extends State<MainWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    if (_hasSeenOnboarding == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-    if (_hasSeenOnboarding == false) {
-      return const OnboardingScreen();
+    final user = AuthService().currentUser;
+    if (user == null) {
+      if (_hasSeenOnboarding == null) {
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
+      if (_hasSeenOnboarding == false) {
+        return const OnboardingScreen();
+      }
     }
     return Scaffold(
       backgroundColor: appThemeData.scaffoldBackgroundColor,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'theme/theme_data.dart';
 import 'screens/main_wrapper.dart';
 import 'services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,13 @@ void main() async {
     itemsCollectionId: 'items',
     bucketId: '69381263000d9cb370bc',
   );
+  await AuthService().refreshUser();
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    if (AuthService().currentUser == null) {
+      await prefs.setBool('hasSeenOnboarding', false);
+    }
+  } catch (_) {}
   runApp(const MyApp());
 }
 
