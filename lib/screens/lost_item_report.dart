@@ -230,11 +230,23 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                     category: selectedCategory ?? '-',
                     location: loc,
                     reportDate: reportDate!,
+                    isFound: isFound,
                     imageIds: uploaded,
                   );
                   if (!mounted) return;
+                  // Close progress dialog
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
+                  // Reset form fields and local state
+                  setState(() {
+                    itemNameController.clear();
+                    descriptionController.clear();
+                    locationController.clear();
+                    selectedCategory = null;
+                    reportDate = null;
+                    isFound = false;
+                    _selectedImages.clear();
+                    photoUrls = [];
+                  });
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Report submitted successfully!'),

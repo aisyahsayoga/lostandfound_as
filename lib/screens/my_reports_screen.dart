@@ -51,11 +51,29 @@ class MyReportsScreen extends StatelessWidget {
               final title = (data['title'] ?? 'Untitled').toString();
               final status = (data['isFound'] == true) ? 'Found' : 'Lost';
               final location = (data['location'] ?? '-').toString();
+              String? thumbUrl;
+              final imgs = data['imageIds'];
+              if (imgs is List && imgs.isNotEmpty && imgs.first is String) {
+                thumbUrl = AuthService().fileViewUrl(imgs.first as String);
+              }
               return Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
                   title: Text(title),
                   subtitle: Text('$status • $location'),
+                  trailing: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: (thumbUrl != null)
+                          ? Image.network(thumbUrl, fit: BoxFit.cover)
+                          : Container(
+                              color: Colors.grey.shade200,
+                              child: const Icon(Icons.photo, color: Colors.grey),
+                            ),
+                    ),
+                  ),
                 ),
               );
             },

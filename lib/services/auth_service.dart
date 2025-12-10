@@ -317,6 +317,45 @@ class AuthService {
     return res.documents;
   }
 
+  Future<List<Models.Document>> listRecentAllItems({int limit = 20}) async {
+    final res = await _databases.listDocuments(
+      databaseId: _databaseId,
+      collectionId: _itemsCollectionId,
+      queries: [Query.orderDesc('createdAt'), Query.limit(limit)],
+    );
+    return res.documents;
+  }
+
+  Future<List<Models.Document>> listItemsByCategory(
+    String category, {
+    int limit = 20,
+  }) async {
+    final res = await _databases.listDocuments(
+      databaseId: _databaseId,
+      collectionId: _itemsCollectionId,
+      queries: [
+        Query.equal('category', category),
+        Query.orderDesc('createdAt'),
+        Query.limit(limit),
+      ],
+    );
+    return res.documents;
+  }
+
+  Future<Map<String, int>> getItemCounts() async {
+    final lost = await _databases.listDocuments(
+      databaseId: _databaseId,
+      collectionId: _itemsCollectionId,
+      queries: [Query.equal('isFound', false), Query.limit(1)],
+    );
+    final found = await _databases.listDocuments(
+      databaseId: _databaseId,
+      collectionId: _itemsCollectionId,
+      queries: [Query.equal('isFound', true), Query.limit(1)],
+    );
+    return {'lost': lost.total, 'found': found.total, 'resolved': 0};
+  }
+
   Future<List<Models.Document>> listMyReports() async {
     if (_currentUser == null) return [];
     final res = await _databases.listDocuments(
@@ -336,6 +375,7 @@ class AuthService {
     required String category,
     required String location,
     required DateTime reportDate,
+    required bool isFound,
     List<String>? imageIds,
   }) async {
     if (_currentUser == null) throw Exception('Anda harus login');
@@ -349,7 +389,7 @@ class AuthService {
         'category': category,
         'location': location,
         'reportDate': reportDate.toIso8601String(),
-        'isFound': false,
+        'isFound': isFound,
         'imageIds': imageIds ?? [],
         'reporterId': _currentUser!.id,
         'createdAt': DateTime.now().toIso8601String(),
