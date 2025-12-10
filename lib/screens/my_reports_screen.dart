@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
+import 'package:appwrite/models.dart' as Models;
 import '../theme/theme_data.dart';
-import '../theme/color_palette.dart';
 
 class MyReportsScreen extends StatelessWidget {
   const MyReportsScreen({Key? key}) : super(key: key);
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> _reportsStream(String uid) {
-    return FirebaseFirestore.instance
-        .collection('items')
-        .where('reporterId', isEqualTo: uid)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
+  Future<List<Models.Document>> _reportsFuture(String uid) {
+    return AuthService().listMyReports();
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService().currentUser;
     if (user == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('My Reports')),
@@ -31,8 +26,8 @@ class MyReportsScreen extends StatelessWidget {
     }
     return Scaffold(
       appBar: AppBar(title: const Text('My Reports'), centerTitle: true),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _reportsStream(user.uid),
+      body: FutureBuilder<List<Models.Document>>(
+        future: _reportsFuture(user.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -42,7 +37,7 @@ class MyReportsScreen extends StatelessWidget {
               child: Text('Error: ${snapshot.error}', style: appThemeData.textTheme.bodyLarge),
             );
           }
-          final docs = snapshot.data?.docs ?? [];
+          final docs = snapshot.data ?? [];
           if (docs.isEmpty) {
             return Center(
               child: Text('Belum ada laporan', style: appThemeData.textTheme.bodyLarge),
@@ -52,8 +47,8 @@ class MyReportsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             itemCount: docs.length,
             itemBuilder: (context, index) {
-              final data = docs[index].data();
-              final title = (data['itemName'] ?? 'Untitled').toString();
+              final data = docs[index].data;
+              final title = (data['title'] ?? 'Untitled').toString();
               final status = (data['isFound'] == true) ? 'Found' : 'Lost';
               final location = (data['location'] ?? '-').toString();
               return Card(

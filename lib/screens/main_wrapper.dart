@@ -8,7 +8,8 @@ import 'onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainWrapper extends StatefulWidget {
-  const MainWrapper({Key? key}) : super(key: key);
+  final int initialIndex;
+  const MainWrapper({Key? key, this.initialIndex = 0}) : super(key: key);
 
   @override
   State<MainWrapper> createState() => _MainWrapperState();
@@ -21,6 +22,7 @@ class _MainWrapperState extends State<MainWrapper> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
     _loadOnboardingFlag();
   }
 

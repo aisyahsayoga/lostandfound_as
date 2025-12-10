@@ -3,9 +3,12 @@ import '../theme/theme_data.dart';
 import '../components/form_fields.dart';
 import '../components/buttons.dart';
 import '../components/animations.dart';
-import '../services/auth_service.dart';
 import 'login.dart';
-import 'item_list_screen.dart';
+import '../services/auth_service.dart';
+import 'package:appwrite/appwrite.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'main_wrapper.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -22,23 +25,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
       TextEditingController();
   bool _isPasswordObscured = true;
   bool _isConfirmPasswordObscured = true;
+  XFile? _avatar;
 
   void _onSignUpPressed() async {
     try {
-      final success = await AuthService().signUp(
-        nameController.text,
-        emailController.text,
-        passwordController.text,
-        confirmPasswordController.text,
+      final fullName = nameController.text.trim();
+      final email = emailController.text.trim();
+      final password = passwordController.text.trim();
+      final confirm = confirmPasswordController.text.trim();
+      await AuthService().signUp(
+        fullName,
+        email,
+        password,
+        confirm,
+        avatarPath: _avatar?.path,
       );
 
-      if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Akun berhasil dibuat!')),
-          );
-          Navigator.of(context).pop();
-        }
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Akun berhasil dibuat!')));
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainWrapper(initialIndex: 2)),
+        (route) => false,
+      );
+    } on AppwriteException catch (e) {
+      if (!mounted) return;
+      if (e.code == 409) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Akun sudah ada, silakan login')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message ?? e.toString())));
       }
     } catch (e) {
       if (mounted) {
@@ -46,6 +71,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
+    }
+  }
+
+  Future<void> _pickAvatar() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
+    if (picked != null) {
+      setState(() => _avatar = picked);
     }
   }
 
@@ -74,6 +110,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+              FadeIn(
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundImage: (_avatar != null)
+                          ? Image.file(File(_avatar!.path)).image
+                          : null,
+                      child: _avatar == null ? const Icon(Icons.person) : null,
+                    ),
+                    const SizedBox(width: 12),
+                    OutlinedButton(
+                      onPressed: _pickAvatar,
+                      child: const Text('Choose Photo (Optional)'),
+                    ),
+                  ],
+                ),
+              ),
               FadeIn(
                 child: TextInputField(
                   label: 'Full Name',

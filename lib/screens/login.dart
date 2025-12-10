@@ -5,8 +5,8 @@ import '../components/animations.dart';
 import '../theme/theme_data.dart';
 import '../theme/typography.dart';
 import '../services/auth_service.dart';
-import 'item_list_screen.dart';
 import 'sign_up.dart';
+import 'package:appwrite/appwrite.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -23,18 +23,21 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onLoginPressed() async {
     try {
       final success = await AuthService().login(
-        emailController.text,
-        passwordController.text,
+        emailController.text.trim(),
+        passwordController.text.trim(),
       );
-
-      if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Login berhasil!')));
-          Navigator.of(context).pop();
-        }
+      if (success && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login berhasil!')));
+        await AuthService().refreshUser();
+        Navigator.of(context).pop();
       }
+    } on AppwriteException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? e.toString())));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -51,9 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _onForgotPasswordPressed() {
-    // TODO: Implement forgot password flow
-  }
+  // forgot password flow removed
 
   @override
   Widget build(BuildContext context) {
@@ -110,17 +111,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              FadeIn(
-                child: TextButton(
-                  onPressed: _onForgotPasswordPressed,
-                  child: Text(
-                    'Forgot password?',
-                    style: appThemeData.textTheme.bodyMedium!.copyWith(
-                      color: appThemeData.colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ),
               const SizedBox(height: 16),
               FadeIn(
                 child: Row(

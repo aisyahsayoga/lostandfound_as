@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import '../components/form_fields.dart';
 import '../components/buttons.dart';
+import '../services/auth_service.dart';
 
 class LostItemReportScreen extends StatefulWidget {
   const LostItemReportScreen({Key? key}) : super(key: key);
@@ -187,7 +184,7 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
               label: 'Submit',
               fullWidth: true,
               onPressed: () async {
-                final user = FirebaseAuth.instance.currentUser;
+                final user = AuthService().currentUser;
                 if (user == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -223,28 +220,18 @@ class _LostItemReportScreenState extends State<LostItemReportScreen> {
                   final uploaded = <String>[];
                   for (var i = 0; i < _selectedImages.length; i++) {
                     final x = _selectedImages[i];
-                    final ref = FirebaseStorage.instance.ref().child(
-                      'item_photos/${user.uid}/${DateTime.now().toIso8601String()}_$i.jpg',
-                    );
-                    await ref.putFile(File(x.path));
-                    final url = await ref.getDownloadURL();
-                    uploaded.add(url);
+                    final fid = await AuthService().uploadFileFromPath(x.path);
+                    uploaded.add(fid);
                   }
 
-                  final data = {
-                    'itemName': name,
-                    'description': desc,
-                    'category': selectedCategory,
-                    'location': loc,
-                    'reportDate': reportDate,
-                    'isFound': isFound,
-                    'createdAt': FieldValue.serverTimestamp(),
-                    'reporterId': user.uid,
-                    'photoUrls': uploaded,
-                  };
-                  await FirebaseFirestore.instance
-                      .collection('items')
-                      .add(data);
+                  await AuthService().createItem(
+                    title: name,
+                    description: desc,
+                    category: selectedCategory ?? '-',
+                    location: loc,
+                    reportDate: reportDate!,
+                    imageIds: uploaded,
+                  );
                   if (!mounted) return;
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();

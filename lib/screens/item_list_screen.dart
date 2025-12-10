@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../services/auth_service.dart';
+import 'package:appwrite/models.dart' as Models;
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import 'lost_item_report.dart';
@@ -15,20 +15,10 @@ class ItemListScreen extends StatefulWidget {
 }
 
 class _ItemListScreenState extends State<ItemListScreen> {
-  Stream<QuerySnapshot<Map<String, dynamic>>> _itemsStream() {
-    return FirebaseFirestore.instance
-        .collection('items')
-        .where('isFound', isEqualTo: false)
-        .orderBy('createdAt', descending: true)
-        .snapshots();
-  }
-
   String _formatDate(dynamic value) {
     if (value == null) return '-';
     DateTime? dt;
-    if (value is Timestamp) {
-      dt = value.toDate();
-    } else if (value is DateTime) {
+    if (value is DateTime) {
       dt = value;
     } else if (value is String) {
       try {
@@ -57,8 +47,8 @@ class _ItemListScreenState extends State<ItemListScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _itemsStream(),
+      body: FutureBuilder<List<Models.Document>>(
+        future: AuthService().listRecentItems(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -71,7 +61,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
               ),
             );
           }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
                 'No lost items reported yet.',
@@ -80,13 +70,13 @@ class _ItemListScreenState extends State<ItemListScreen> {
             );
           }
 
-          final docs = snapshot.data!.docs;
+          final docs = snapshot.data!;
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             itemCount: docs.length,
             itemBuilder: (context, index) {
-              final data = docs[index].data();
-              final itemName = (data['itemName'] ?? 'Unknown Item').toString();
+              final data = docs[index].data;
+              final itemName = (data['title'] ?? 'Unknown Item').toString();
               final location = (data['location'] ?? '-').toString();
               final reportDate = _formatDate(data['reportDate']);
 
@@ -103,7 +93,8 @@ class _ItemListScreenState extends State<ItemListScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ItemDetailScreen(documentId: docs[index].id),
+                        builder: (_) =>
+                            ItemDetailScreen(documentId: docs[index].$id),
                       ),
                     );
                   },
@@ -119,7 +110,10 @@ class _ItemListScreenState extends State<ItemListScreen> {
                             color: AppColors.neutralLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.camera_alt, color: Colors.grey),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                       title: Text(
@@ -153,14 +147,14 @@ class _ItemListScreenState extends State<ItemListScreen> {
   }
 
   Future<void> _onAddButtonPressed() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService().currentUser;
     if (user == null) {
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
-    if (FirebaseAuth.instance.currentUser != null) {
+    if (AuthService().currentUser != null) {
       if (!mounted) return;
       Navigator.push(
         context,

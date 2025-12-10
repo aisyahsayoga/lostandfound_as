@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:appwrite/models.dart' as Models;
+import '../services/auth_service.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
 import '../components/buttons.dart';
@@ -14,19 +15,14 @@ class ItemDetailScreen extends StatefulWidget {
 }
 
 class _ItemDetailScreenState extends State<ItemDetailScreen> {
-  Future<DocumentSnapshot<Map<String, dynamic>>> _loadDoc() {
-    return FirebaseFirestore.instance
-        .collection('items')
-        .doc(widget.documentId)
-        .get();
+  Future<Models.Document> _loadDoc() {
+    return AuthService().getItem(widget.documentId);
   }
 
   String _fmtDate(dynamic value) {
     if (value == null) return '-';
     DateTime? dt;
-    if (value is Timestamp) {
-      dt = value.toDate();
-    } else if (value is DateTime) {
+    if (value is DateTime) {
       dt = value;
     } else if (value is String) {
       try {
@@ -62,16 +58,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       },
     );
     if (confirmed != true) return;
-    await FirebaseFirestore.instance
-        .collection('items')
-        .doc(widget.documentId)
-        .update({'isFound': true});
+    await AuthService().markItemFound(widget.documentId);
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+    return FutureBuilder<Models.Document>(
       future: _loadDoc(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -79,7 +72,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+        if (snapshot.hasError || !snapshot.hasData) {
           return Scaffold(
             appBar: AppBar(title: const Text('Item Details')),
             body: Center(
@@ -90,8 +83,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             ),
           );
         }
-        final data = snapshot.data!.data()!;
-        final itemName = (data['itemName'] ?? 'Item').toString();
+        final data = snapshot.data!.data;
+        final itemName = (data['title'] ?? 'Item').toString();
         final description = (data['description'] ?? '-').toString();
         final category = (data['category'] ?? '-').toString();
         final location = (data['location'] ?? '-').toString();

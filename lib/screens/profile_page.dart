@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../theme/theme_data.dart';
 import '../theme/color_palette.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'my_reports_screen.dart';
-import 'main_wrapper.dart';
+import '../components/buttons.dart';
+import 'edit_profile_screen.dart';
+import 'login.dart';
+import '../services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -31,75 +33,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _profileHeaderCard() {
-    final user = FirebaseAuth.instance.currentUser;
-    final displayName = user?.displayName;
-    final email = user?.email;
-    final initials = (displayName ?? 'Guest')
-        .split(' ')
-        .where((p) => p.isNotEmpty)
-        .map((p) => p[0])
-        .take(2)
-        .join()
-        .toUpperCase();
-    final nameText = displayName ?? userName;
-    final emailText = email ?? userEmail;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [AppColors.accentSecondary, AppColors.accentPrimary],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 36,
-            backgroundColor: Colors.white,
-            child: Text(
-              initials.isEmpty ? 'G' : initials,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            nameText,
-            style: appThemeData.textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            emailText.isEmpty ? 'Guest Mode' : emailText,
-            style: appThemeData.textTheme.labelSmall?.copyWith(
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _tile({
     required IconData icon,
     required String title,
     String? subtitle,
     VoidCallback? onTap,
+    bool enabled = true,
   }) {
     return InkWell(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(16),
@@ -122,10 +64,20 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: appThemeData.textTheme.bodyLarge),
+                  Text(
+                    title,
+                    style: appThemeData.textTheme.bodyLarge?.copyWith(
+                      color: enabled ? null : Colors.grey,
+                    ),
+                  ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 4),
-                    Text(subtitle, style: appThemeData.textTheme.labelSmall),
+                    Text(
+                      subtitle,
+                      style: appThemeData.textTheme.labelSmall?.copyWith(
+                        color: enabled ? null : Colors.grey,
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -137,139 +89,240 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _logoutTile() {
-    return OutlinedButton.icon(
-      onPressed: () async {
-        await FirebaseAuth.instance.signOut();
-        if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const MainWrapper()),
-          (route) => false,
-        );
-      },
-      icon: const Icon(Icons.logout),
-      label: const Text('Log Out'),
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.accentPrimary,
-        side: BorderSide(color: AppColors.accentPrimary),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.neutralDark,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        children: [
-          _profileHeaderCard(),
-          const SizedBox(height: 24),
-          Text('Account', style: appThemeData.textTheme.headlineSmall),
-          const SizedBox(height: 12),
-          _tile(
-            icon: Icons.person_outline,
-            title: 'Edit Profile',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit Profile tapped')),
-              );
-            },
+    return StreamBuilder<AppUser?>(
+      stream: AuthService().authStateChanges,
+      initialData: AuthService().currentUser,
+      builder: (context, snapshot) {
+        final user = snapshot.data;
+        final displayName = user?.name ?? 'Guest User';
+        final email = user?.email ?? 'Log in to manage your account';
+        final isLoggedIn = user != null;
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('My Profile'),
+            elevation: 0,
+            centerTitle: true,
+            backgroundColor: AppColors.surface,
+            foregroundColor: AppColors.neutralDark,
           ),
-          _tile(
-            icon: Icons.assignment,
-            title: 'My Reports',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const MyReportsScreen()),
-              );
-            },
-          ),
-          _tile(
-            icon: Icons.bookmark_outline,
-            title: 'Saved Items',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Saved Items tapped')),
-              );
-            },
-          ),
-          const SizedBox(height: 24),
-          Text('Settings', style: appThemeData.textTheme.headlineSmall),
-          const SizedBox(height: 12),
-          _tile(
-            icon: Icons.language,
-            title: 'Language',
-            subtitle: languageSelected,
-            onTap: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Language tapped')));
-            },
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.shadow,
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                _leadingIcon(Icons.dark_mode_outlined),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Dark Mode',
-                    style: appThemeData.textTheme.bodyLarge,
+          body: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      AppColors.accentSecondary,
+                      AppColors.accentPrimary,
+                    ],
                   ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow,
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                Switch(
-                  value: darkModeEnabled,
-                  onChanged: (v) => setState(() => darkModeEnabled = v),
-                  trackColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return appThemeData.colorScheme.primary.withValues(
-                        alpha: 0.3,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Builder(
+                      builder: (_) {
+                        final url = AuthService().fileViewUrl(
+                          user?.avatarFileId,
+                        );
+                        if (url != null) {
+                          return CircleAvatar(
+                            radius: 36,
+                            backgroundImage: NetworkImage(url),
+                            backgroundColor: Colors.white,
+                          );
+                        }
+                        return CircleAvatar(
+                          radius: 36,
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            displayName.isNotEmpty
+                                ? displayName[0].toUpperCase()
+                                : 'G',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      displayName,
+                      style: appThemeData.textTheme.headlineMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      style: appThemeData.textTheme.labelSmall?.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text('Account', style: appThemeData.textTheme.headlineSmall),
+              const SizedBox(height: 12),
+              _tile(
+                icon: Icons.person_outline,
+                title: 'Edit Profile',
+                enabled: isLoggedIn,
+                onTap: isLoggedIn
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const EditProfileScreen(),
+                          ),
+                        );
+                      }
+                    : null,
+              ),
+              _tile(
+                icon: Icons.assignment,
+                title: 'My Reports',
+                enabled: isLoggedIn,
+                onTap: isLoggedIn
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MyReportsScreen(),
+                          ),
+                        );
+                      }
+                    : null,
+              ),
+              // Saved Items dihapus sesuai spesifikasi
+              const SizedBox(height: 24),
+              Text('Settings', style: appThemeData.textTheme.headlineSmall),
+              const SizedBox(height: 12),
+              _tile(
+                icon: Icons.language,
+                title: 'Language',
+                subtitle: languageSelected,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Language tapped')),
+                  );
+                },
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow,
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    _leadingIcon(Icons.dark_mode_outlined),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Dark Mode',
+                        style: appThemeData.textTheme.bodyLarge,
+                      ),
+                    ),
+                    Switch(
+                      value: darkModeEnabled,
+                      onChanged: (v) => setState(() => darkModeEnabled = v),
+                      trackColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return appThemeData.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          );
+                        }
+                        return Colors.grey.withValues(alpha: 0.3);
+                      }),
+                      thumbColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return appThemeData.colorScheme.primary;
+                        }
+                        return appThemeData.colorScheme.secondary;
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+              _tile(
+                icon: Icons.info_outline,
+                title: 'Version',
+                subtitle: appVersion,
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                child: PrimaryButton(
+                  label: isLoggedIn ? 'Log Out' : 'Login / Register',
+                  trailing: isLoggedIn
+                      ? const Icon(Icons.logout)
+                      : const Icon(Icons.login),
+                  fullWidth: true,
+                  onPressed: () async {
+                    if (!isLoggedIn) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
+                      return;
                     }
-                    return Colors.grey.withValues(alpha: 0.3);
-                  }),
-                  thumbColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return appThemeData.colorScheme.primary;
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Confirm'),
+                          content: const Text(
+                            'Are you sure you want to log out?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text('Log Out'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    if (confirmed == true) {
+                      await AuthService().logout();
                     }
-                    return appThemeData.colorScheme.secondary;
-                  }),
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          _tile(
-            icon: Icons.info_outline,
-            title: 'Version',
-            subtitle: appVersion,
-          ),
-          const SizedBox(height: 16),
-          _logoutTile(),
-        ],
-      ),
+        );
+      },
     );
   }
 }
